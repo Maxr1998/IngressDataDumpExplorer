@@ -1,0 +1,5 @@
+# Application binary
+app
+
+# Folder where the data dump should be extracted
+dump/
