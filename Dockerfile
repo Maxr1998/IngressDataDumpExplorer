@@ -7,7 +7,7 @@ RUN go get github.com/mongodb/mongo-go-driver/mongo
 WORKDIR /go/
 
 # Go build
-ADD app.go .
+ADD *.go ./
 RUN go build -o app
 
 ADD static/ static/
