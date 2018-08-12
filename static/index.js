@@ -91,25 +91,23 @@ class CustomLayer extends L.CanvasLayer {
         // Clear buffer
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        // Bind buffer to vertex shader attribute
-        {
-            gl.bindBuffer(gl.ARRAY_BUFFER, appProgramData.buffer);
+        function draw(buffer, size, color) {
+            // Bind buffer to vertex shader attribute
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
             gl.vertexAttribPointer(appProgramInfo.attribLocations.position, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(appProgramInfo.attribLocations.position);
+
+            // Set uniform values
+            setUniforms(map, color)
+
+            // Draw!
+            gl.drawArrays(gl.POINTS, 0, size);
         }
+
         gl.useProgram(appProgramInfo.program);
 
-        // Set uniform values
-        {
-            var origin = map.project(map.containerPointToLatLng([0, 0]), 18)._round().toArray();
-            gl.uniform2fv(appProgramInfo.uniformLocations.panning, origin);
-            gl.uniform2fv(appProgramInfo.uniformLocations.canvasSize, map.getSize().toArray());
-            gl.uniform1f(appProgramInfo.uniformLocations.zoom, map._zoom);
-            gl.uniform4f(appProgramInfo.uniformLocations.color, 0.9, 0.3, 0.1, 1.0);
-        }
-
-        // Draw!
-        gl.drawArrays(gl.POINTS, 0, appProgramData.size);
+        draw(appProgramData.visitsBuffer, appProgramData.visitsSize, [0.8, 0.2, 0.1, 1.0]);
+        draw(appProgramData.capturesBuffer, appProgramData.capturesSize, [0.9, 0.4, 0.1, 1.0]);
     }
 
     _onLayerDidMove() {
@@ -121,18 +119,34 @@ function loadData(map) {
     if (!data)
         return
 
-    // Project LatLong data onto WebMercator canvas
-    data.visits = data.visits.map(x => map.project(L.latLng(x), 18)._round().toArray());
+    function createBuffer(bufferData) {
+        // Project LatLong data onto WebMercator canvas
+        bufferData = bufferData.map(x => map.project(L.latLng(x), 18)._round().toArray());
 
-    // Buffer object
-    var visitsBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, visitsBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.visits.flat()), gl.STATIC_DRAW);
+        // Buffer object
+        var buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bufferData.flat()), gl.STATIC_DRAW);
+        return buffer;
+    }
+
+    var visitsBuffer = createBuffer(data.visits);
+    var capturesBuffer = createBuffer(data.captures);
 
     return {
-        buffer: visitsBuffer,
-        size: data.visits.length
+        visitsBuffer: visitsBuffer,
+        visitsSize: data.visits.length,
+        capturesBuffer: capturesBuffer,
+        capturesSize: data.captures.length,
     };
+}
+
+function setUniforms(map, color) {
+    var origin = map.project(map.containerPointToLatLng([0, 0]), 18)._round().toArray();
+    gl.uniform2fv(appProgramInfo.uniformLocations.panning, origin);
+    gl.uniform2fv(appProgramInfo.uniformLocations.canvasSize, map.getSize().toArray());
+    gl.uniform1f(appProgramInfo.uniformLocations.zoom, map._zoom);
+    gl.uniform4fv(appProgramInfo.uniformLocations.color, color);
 }
 
 // INIT
