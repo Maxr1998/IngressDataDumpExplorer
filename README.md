@@ -1,6 +1,6 @@
 # IngressDataDumpExplorer
 ### About
-IngressDataDumpExplorer is a set of tools that allows you to explore your Ingress gamedata exported by Niantic as part of their GDPR compliance.
+IngressDataDumpExplorer is a set of tools that allows you to visually explore your Ingress gamedata exported by Niantic as part of their GDPR compliance.
 
 ### How to get the data
 Simply write an E-Mail to `privacy@nianticlabs.com`:
@@ -22,7 +22,7 @@ docker run -p 8080:8080 dump-explorer:latest # Launch
 
 Afterwards, navigate to `localhost:8080` in your favorite web browser (I only tested with Google Chrome).
 
-<img src="example_screen.png" height="400px" />
+<img src="example_screen.png" width="960px" />
 
 ---
 
