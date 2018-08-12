@@ -43,7 +43,7 @@ func processData(fileContents [][]string, output []json.RawMessage, matcher func
 	return output
 }
 
-func readCoordinates() []byte {
+func getVisitsAndCaptures() []byte {
 	var fileContents [][]string
 	var err error
 
@@ -57,13 +57,19 @@ func readCoordinates() []byte {
 		return line[3] == "captured portal" && line[4] != "failed"
 	})
 
-	visitedPortals := make([]json.RawMessage, len(capturedPortals))
-	copy(visitedPortals, capturedPortals)
+	visitedPortals := make([]json.RawMessage, 0)
 	visitedPortals = processData(fileContents, visitedPortals, func(line []string) bool {
 		return ((strings.HasPrefix(line[3], "hacked") && strings.HasSuffix(line[3], "portal")) || strings.HasSuffix(line[3], "deployed")) && line[4] != "failed"
 	})
 
-	if encodedJSON, err := json.Marshal(visitedPortals); err == nil {
+	result := struct {
+		Visits   []json.RawMessage `json:"visits"`
+		Captures []json.RawMessage `json:"captures"`
+	}{
+		visitedPortals, capturedPortals,
+	}
+
+	if encodedJSON, err := json.Marshal(result); err == nil {
 		return encodedJSON
 	}
 	log.Println(err)

@@ -1,3 +1,10 @@
+function fetchJSON(file, callback) {
+    fetch(file)
+        .then(response => response.json())
+        .then(json => callback(json), null)
+        .catch(error => callback(null, error))
+}
+
 function createProgram(gl, vertexShader, fragmentShader) {
     var program = gl.createProgram();
 

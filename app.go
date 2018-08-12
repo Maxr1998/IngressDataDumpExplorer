@@ -13,7 +13,7 @@ func main() {
 
 func handler(w http.ResponseWriter, req *http.Request) {
 	if req.URL.Path == "/data.js" {
-		w.Write([]byte("var rawData = " + string(readCoordinates())))
+		w.Write(getVisitsAndCaptures())
 		return
 	}
 	log.Println("GET file:", req.URL.Path)

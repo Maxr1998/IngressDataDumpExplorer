@@ -28,6 +28,7 @@ void main() {
 var leafletMap;
 var gl;
 var appProgramInfo;
+var appProgramData;
 var data;
 
 class CustomLayer extends L.CanvasLayer {
@@ -70,19 +71,19 @@ class CustomLayer extends L.CanvasLayer {
             };
 
             // Load the data
-            data = loadData(this._map);
+            appProgramData = loadData(this._map);
         }
     }
 
     onLayerWillUnmount() {
         gl = undefined;
         appProgramInfo = undefined;
-        data = undefined;
+        appProgramData = undefined;
     }
 
     onDrawLayer(_info) {
         var map = this._map;
-        if (!appProgramInfo || !data)
+        if (!appProgramInfo || !appProgramData)
             return;
 
         //gl.clearColor(0.0, 0.0, 0.0, 0.2); // Draw shade, disabled by default
@@ -92,7 +93,7 @@ class CustomLayer extends L.CanvasLayer {
 
         // Bind buffer to vertex shader attribute
         {
-            gl.bindBuffer(gl.ARRAY_BUFFER, data.buffer);
+            gl.bindBuffer(gl.ARRAY_BUFFER, appProgramData.buffer);
             gl.vertexAttribPointer(appProgramInfo.attribLocations.position, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(appProgramInfo.attribLocations.position);
         }
@@ -108,7 +109,7 @@ class CustomLayer extends L.CanvasLayer {
         }
 
         // Draw!
-        gl.drawArrays(gl.POINTS, 0, data.size);
+        gl.drawArrays(gl.POINTS, 0, appProgramData.size);
     }
 
     _onLayerDidMove() {
@@ -117,20 +118,20 @@ class CustomLayer extends L.CanvasLayer {
 }
 
 function loadData(map) {
-    if (!rawData)
+    if (!data)
         return
 
     // Project LatLong data onto WebMercator canvas
-    rawData = rawData.map(x => map.project(L.latLng(x), 18)._round().toArray());
+    data.visits = data.visits.map(x => map.project(L.latLng(x), 18)._round().toArray());
 
     // Buffer object
-    var buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rawData.flat()), gl.STATIC_DRAW);
+    var visitsBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, visitsBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.visits.flat()), gl.STATIC_DRAW);
 
     return {
-        buffer: buffer,
-        size: rawData.length
+        buffer: visitsBuffer,
+        size: data.visits.length
     };
 }
 
@@ -138,6 +139,15 @@ function loadData(map) {
 leafletMap = L.map('map').setView([51.0, 10.2], 7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{param}', { param: '' }).addTo(leafletMap);
 
-// Create WebGL layer
-var customLayer = new CustomLayer();
-customLayer.addTo(leafletMap);
+// Load data
+fetchJSON("/data.js", (result, error) => {
+    if (result) {
+        data = result;
+
+        // Create and add WebGL layer
+        var customLayer = new CustomLayer();
+        customLayer.addTo(leafletMap);
+    } else if (error) {
+        console.log(error);
+    }
+});
