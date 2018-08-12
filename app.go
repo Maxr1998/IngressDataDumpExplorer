@@ -12,7 +12,7 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, req *http.Request) {
-	if req.URL.Path == "/data.js" {
+	if req.URL.Path == "/data.json" {
 		w.Header().Add("Cache-Control", "no-cache")
 		w.Write(getVisitsAndCaptures())
 		return
