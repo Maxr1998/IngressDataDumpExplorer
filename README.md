@@ -22,6 +22,8 @@ docker run -p 8080:8080 dump-explorer:latest # Launch
 
 Afterwards, navigate to `localhost:8080` in your favorite web browser (I only tested with Google Chrome).
 
+<img src="example_screen.png" height="400px" />
+
 ---
 
 **Notice:** For now, you first need to execute the following command once, to fix the format errors in Niantic's dump. This will be integrated into the application in the future.
