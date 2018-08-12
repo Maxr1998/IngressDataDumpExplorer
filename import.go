@@ -46,7 +46,6 @@ func processData(fileContents [][]string, output []json.RawMessage, matcher func
 func getVisitsAndCaptures() []byte {
 	var fileContents [][]string
 	var err error
-
 	if fileContents, err = readFile(); err != nil {
 		log.Println(err)
 		return nil
@@ -69,9 +68,10 @@ func getVisitsAndCaptures() []byte {
 		visitedPortals, capturedPortals,
 	}
 
-	if encodedJSON, err := json.Marshal(result); err == nil {
-		return encodedJSON
+	var encodedJSON []byte
+	if encodedJSON, err = json.Marshal(result); err != nil {
+		log.Println(err)
+		return nil
 	}
-	log.Println(err)
-	return nil
+	return encodedJSON
 }
