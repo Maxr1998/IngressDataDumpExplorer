@@ -3,17 +3,26 @@ attribute vec2 position;
 uniform vec2 panning;
 uniform vec2 canvasSize;
 uniform float zoom;
+uniform vec4 color;
+
+varying vec4 vColor;
 
 void main()  {
     float divideFactor = exp2(18.0 - zoom);
     vec2 xy = ((position - panning) / canvasSize / vec2(divideFactor)) - vec2(0.5);
     gl_Position = vec4(xy * vec2(2.0, -2.0), 0.0, 1.0);
     gl_PointSize = 5.0 + 8.0/(4.0+zoom);
+
+    vColor = color;
 }`;
 
 const fragmentShaderSrc = `
+precision mediump float;
+
+varying vec4 vColor;
+
 void main() {
-    gl_FragColor = vec4(0.9, 0.3, 0.1, 1.0);
+    gl_FragColor = vColor;
 }`;
 
 var leafletMap;
@@ -56,6 +65,7 @@ class CustomLayer extends L.CanvasLayer {
                     panning: gl.getUniformLocation(program, 'panning'),
                     canvasSize: gl.getUniformLocation(program, 'canvasSize'),
                     zoom: gl.getUniformLocation(program, 'zoom'),
+                    color: gl.getUniformLocation(program, 'color'),
                 },
             };
 
@@ -94,6 +104,7 @@ class CustomLayer extends L.CanvasLayer {
             gl.uniform2fv(appProgramInfo.uniformLocations.panning, origin);
             gl.uniform2fv(appProgramInfo.uniformLocations.canvasSize, map.getSize().toArray());
             gl.uniform1f(appProgramInfo.uniformLocations.zoom, map._zoom);
+            gl.uniform4f(appProgramInfo.uniformLocations.color, 0.9, 0.3, 0.1, 1.0);
         }
 
         // Draw!
