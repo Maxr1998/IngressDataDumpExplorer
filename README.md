@@ -13,8 +13,12 @@ Simply write an E-Mail to `privacy@nianticlabs.com`:
 ### How to use
 You have to extract the password protected zip you got from Niantic into a new folder called `dump` inside this sourcetree. It must contain files like `game_log.tsv`.
 
-You can then run this program in docker with the following commands:
+You can either build the application with `go build app.go import.go set.go` or download a precompiled release from the [releases page](https://github.com/Maxr1998/IngressDataDumpExplorer/releases).
 
+Then, simply run the app/app.exe in a Terminal/Cmd.
+
+
+**Alternatively**, you can run the app in docker with the following commands:
 ```bash
 docker build . -t dump-explorer              # Needed once
 docker run -p 8080:8080 dump-explorer:latest # Launch
