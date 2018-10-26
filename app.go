@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -12,11 +13,17 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, req *http.Request) {
+	log.Println("GET file:", req.URL.Path)
 	if req.URL.Path == "/data.json" {
-		w.Header().Add("Cache-Control", "no-cache")
-		w.Write(getVisitsAndCaptures())
+		if _, err := os.Stat("dump/data.json"); !os.IsNotExist(err) {
+			log.Println("→ found locally")
+			http.ServeFile(w, req, "dump/data.json")
+		} else {
+			log.Println("→ generating now")
+			w.Header().Add("Cache-Control", "no-cache")
+			w.Write(getVisitsAndCaptures())
+		}
 		return
 	}
-	log.Println("GET file:", req.URL.Path)
 	http.ServeFile(w, req, "static/"+req.URL.Path)
 }
