@@ -1,40 +1,28 @@
-# IngressDataDumpExplorer
-### About
-IngressDataDumpExplorer is a set of tools that allows you to visually explore your Ingress gamedata exported by Niantic as part of their GDPR compliance.
-
-### How to get the data
-Simply write an E-Mail to `privacy@nianticlabs.com`:
+### Como pedir los datos
+Mandas un mail a `privacy@nianticlabs.com`:
 
 > Dear Sir or Madam,  
 > I'd like to request a dump of the raw data Niantic stores about my Ingress account @<account_name>, as regulated under GDPR.  
 > Yours sincerely,  
-> <your_name>
+> <tu_nombre>
 
-### How to use
-You have to extract the password protected zip you got from Niantic into a new folder called `dump` inside this sourcetree. It must contain files like `game_log.tsv`.
+### Tutorial para usuarios no experimentados (Windows)
 
-You can either build the application with `go build app.go import.go set.go` or download a precompiled release from the [releases page](https://github.com/Maxr1998/IngressDataDumpExplorer/releases).
+1) Click en el boton verde de arriba a la derecha que dice "Clone or download" y luego en "Download zip"
+2) Usando 7zip, winzip o winrar lo deszipeas en el escritorio
+3) Entra a la carpeta que deszipeaste, crea una nueva llamada "dump" y entrá en ella
+4) Copia la direccion de la carpeta, abro el zip que te envió NIA y pone "Extraer en" y pega en carpeta destino la direccion que copiaste
+5) Click en este [link](https://github.com/Maxr1998/IngressDataDumpExplorer/releases/download/1.0.1/app_windows.exe) y lo descargas en la carpeta que creaste en el escritorio
+6) Abri el menu de windows escribi cmd y le das enter, se abre la consola
+7) Ahora entra a la carpeta dump que creaste y te copias la direccion que aparece en la barra de direcciones como en el paso 4
+8) En la consola escribis cd (espacio) y pegas la direccion que copiaste en el paso anterior
+10) Copia y pega el siguiente comando en la consola sed -i "s/None\tNone$/None/g" game_log.tsv y ejecutalo apretando enter. Si eso da un error (Windows 7) baja e instala el programa sed desde este [link](https://sourceforge.net/projects/gnuwin32/files//sed/4.2.1/sed-4.2.1-setup.exe/download)
 
-Then, simply run the app/app.exe in a Terminal/Cmd.
-
-
-**Alternatively**, you can run the app in docker with the following commands:
-```bash
-docker build . -t dump-explorer              # Needed once
-docker run -p 8080:8080 dump-explorer:latest # Launch
-```
-
-Afterwards, navigate to `localhost:8080` in your favorite web browser (I only tested with Google Chrome).
+11) Doble click al programa que bajast en el paso 5) app_windows.exe
+12) Abri el navegador y pone esto en la barra de direcciones localhost:8080
 
 <img src="example_screen.png" width="960px" />
 
----
-
-**Notice:** For now, you first need to execute the following command once, to fix the format errors in Niantic's dump. This will be integrated into the application in the future.
-
-```bash
-sed -i 's/None\tNone$/None/g' game_log.tsv
-```
 
 ### License
 
