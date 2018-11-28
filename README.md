@@ -1,4 +1,6 @@
 # IngressDataDumpExplorer
+*Also available in [Spanish](translations/README_es.md)*
+
 ### About
 IngressDataDumpExplorer is a set of tools that allows you to visually explore your Ingress gamedata exported by Niantic as part of their GDPR compliance.
 
