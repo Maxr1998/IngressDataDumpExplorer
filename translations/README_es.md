@@ -21,7 +21,7 @@ Mandas un mail a `privacy@nianticlabs.com`:
 11) Doble click al programa que bajast en el paso 5) app_windows.exe
 12) Abri el navegador y pone esto en la barra de direcciones localhost:8080
 
-<img src="example_screen.png" width="960px" />
+<img src="../example_screen.png" width="960px" />
 
 
 ### License
