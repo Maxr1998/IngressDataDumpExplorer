@@ -106,8 +106,10 @@ class CustomLayer extends L.CanvasLayer {
 
         gl.useProgram(appProgramInfo.program);
 
-        draw(appProgramData.visitsBuffer, appProgramData.visitsSize, [0.8, 0.2, 0.1, 1.0]);
-        draw(appProgramData.capturesBuffer, appProgramData.capturesSize, [0.9, 0.4, 0.1, 1.0]);
+        if (appProgramData.portalsSize > 0)
+            draw(appProgramData.portalsBuffer, appProgramData.portalsSize, [0.72, 0.11, 0.11, 1.0]);
+        draw(appProgramData.visitsBuffer, appProgramData.visitsSize, [1.0, 0.92, 0.23, 1.0]);
+        draw(appProgramData.capturesBuffer, appProgramData.capturesSize, [0.22, 0.56, 0.24, 1.0]);
     }
 
     _onLayerDidMove() {
@@ -130,10 +132,13 @@ function loadData(map) {
         return buffer;
     }
 
+    var portalsBuffer = createBuffer(data.portals);
     var visitsBuffer = createBuffer(data.visits);
     var capturesBuffer = createBuffer(data.captures);
 
     return {
+        portalsBuffer: portalsBuffer,
+        portalsSize: data.portals.length,
         visitsBuffer: visitsBuffer,
         visitsSize: data.visits.length,
         capturesBuffer: capturesBuffer,

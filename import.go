@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-const open = "["
-const close = "]"
-const seperator = ","
+const jsonOpenTag = "["
+const jsonCloseTag = "]"
+const jsonSeparator = ","
 
-func readFile() ([][]string, error) {
+func readFile(fileName string, separator rune) ([][]string, error) {
 	var err error
-	file, err := os.Open("dump/game_log.tsv")
+	file, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func readFile() ([][]string, error) {
 
 	// Initialize our csv reader
 	csvReader := csv.NewReader(file)
-	csvReader.Comma = '\t'
+	csvReader.Comma = separator
 	csvReader.LazyQuotes = true
 
 	// Read the data
@@ -34,9 +34,9 @@ func readFile() ([][]string, error) {
 }
 
 func processData(fileContents [][]string, output []json.RawMessage, matcher func([]string) bool) []json.RawMessage {
-	for _, data := range fileContents {
-		if matcher(data) {
-			item := []byte(open + data[1] + seperator + data[2] + close)
+	for _, line := range fileContents {
+		if matcher(line) {
+			item := []byte(jsonOpenTag + line[1] + jsonSeparator + line[2] + jsonCloseTag)
 			_, output = AddToUniqueSortedJSONSet(output, item)
 		}
 	}
@@ -46,7 +46,17 @@ func processData(fileContents [][]string, output []json.RawMessage, matcher func
 func getVisitsAndCaptures() []byte {
 	var fileContents [][]string
 	var err error
-	if fileContents, err = readFile(); err != nil {
+
+	portals := make([]json.RawMessage, 0)
+	if fileContents, err = readFile("dump/Portal_Export.csv", ','); err != nil {
+		log.Println("Did not find scraped portal list, ignoring…")
+	} else {
+		portals = processData(fileContents, portals, func(line []string) bool {
+			return true;
+		})
+	}
+
+	if fileContents, err = readFile("dump/game_log.tsv", '\t'); err != nil {
 		log.Println(err)
 		return nil
 	}
@@ -62,10 +72,11 @@ func getVisitsAndCaptures() []byte {
 	})
 
 	result := struct {
+		Portals  []json.RawMessage `json:"portals"`
 		Visits   []json.RawMessage `json:"visits"`
 		Captures []json.RawMessage `json:"captures"`
 	}{
-		visitedPortals, capturedPortals,
+		portals, visitedPortals, capturedPortals,
 	}
 
 	var encodedJSON []byte
