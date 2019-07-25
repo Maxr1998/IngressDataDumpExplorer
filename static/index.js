@@ -11,7 +11,7 @@ void main()  {
     float divideFactor = exp2(18.0 - zoom);
     vec2 xy = ((position - panning) / canvasSize / vec2(divideFactor)) - vec2(0.5);
     gl_Position = vec4(xy * vec2(2.0, -2.0), 0.0, 1.0);
-    gl_PointSize = 5.0 + 8.0/(4.0+zoom);
+    gl_PointSize = max(3.2, 0.00055 * pow(zoom, 3.5));
 
     vColor = color;
 }`;
