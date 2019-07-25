@@ -1,5 +1,55 @@
 html, body, #map {
-  margin: 0;
-  padding: 0;
-  height: 100%;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+#controls {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: 12px 0px 16px;
+    max-width: 480px;
+    background-color: white;
+    z-index: 999;
+}
+
+.line-item {
+    margin: 0;
+    padding: 8px 0px;
+    padding-left: 48px;
+    padding-right: 16px;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+    user-select: none;
+}
+
+.line-item:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.line-item:active {
+    background-color: rgba(0, 0, 0, 0.12);
+}
+
+.line-item > i.indicator {
+    position: absolute;
+    left: 16px;
+    width: 1.2em;
+    height: 1.2em;
+}
+
+.line-item > i.indicator.all {
+    background-color: rgb(183.6, 28.05, 28.05);
+}
+
+.line-item > i.indicator.visited {
+    background-color: rgb(255, 234.6, 58.65);
+}
+
+.line-item > i.indicator.captured {
+    background-color: rgb(56.1, 142.8, 61.2);
+}
+
+.line-item.disabled > i.indicator {
+    background-color: rgb(128, 128, 128);
 }

@@ -170,3 +170,12 @@ fetchJSON("/data.json", (result, error) => {
         console.log(error);
     }
 });
+
+[...document.getElementsByClassName("line-item")].forEach(function (x) {
+    x.addEventListener("click", function (e) {
+        var target = e.target;
+        if (!target.classList.contains("disabled"))
+            target.classList.add("disabled");
+        else target.classList.remove("disabled");
+    })
+});
