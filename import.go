@@ -52,7 +52,7 @@ func getVisitsAndCaptures() []byte {
 		log.Println("Did not find scraped portal list, ignoring…")
 	} else {
 		portals = processData(fileContents, portals, func(line []string) bool {
-			return true;
+			return true
 		})
 	}
 
