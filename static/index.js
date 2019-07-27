@@ -26,6 +26,7 @@ void main() {
 }`;
 
 var leafletMap;
+var customLayer;
 var gl;
 var appProgramInfo;
 var appProgramData;
@@ -106,10 +107,12 @@ class CustomLayer extends L.CanvasLayer {
 
         gl.useProgram(appProgramInfo.program);
 
-        if (appProgramData.portalsSize > 0)
+        if (appProgramData.portalsSize > 0 && appProgramData.drawPortals)
             draw(appProgramData.portalsBuffer, appProgramData.portalsSize, [0.72, 0.11, 0.11, 1.0]);
-        draw(appProgramData.visitsBuffer, appProgramData.visitsSize, [1.0, 0.92, 0.23, 1.0]);
-        draw(appProgramData.capturesBuffer, appProgramData.capturesSize, [0.22, 0.56, 0.24, 1.0]);
+        if (appProgramData.drawVisits)
+            draw(appProgramData.visitsBuffer, appProgramData.visitsSize, [1.0, 0.92, 0.23, 1.0]);
+        if (appProgramData.drawCaptures)
+            draw(appProgramData.capturesBuffer, appProgramData.capturesSize, [0.22, 0.56, 0.24, 1.0]);
     }
 
     _onLayerDidMove() {
@@ -139,10 +142,13 @@ function loadData(map) {
     return {
         portalsBuffer: portalsBuffer,
         portalsSize: data.portals.length,
+        drawPortals: true,
         visitsBuffer: visitsBuffer,
         visitsSize: data.visits.length,
+        drawVisits: true,
         capturesBuffer: capturesBuffer,
         capturesSize: data.captures.length,
+        drawCaptures: true,
     };
 }
 
@@ -164,7 +170,7 @@ fetchJSON("/data.json", (result, error) => {
         data = result;
 
         // Create and add WebGL layer
-        var customLayer = new CustomLayer();
+        customLayer = new CustomLayer();
         customLayer.addTo(leafletMap);
     } else if (error) {
         console.log(error);
@@ -173,9 +179,21 @@ fetchJSON("/data.json", (result, error) => {
 
 [...document.getElementsByClassName("line-item")].forEach(function (x) {
     x.addEventListener("click", function (e) {
-        var target = e.target;
-        if (!target.classList.contains("disabled"))
-            target.classList.add("disabled");
-        else target.classList.remove("disabled");
+        var classes = e.target.classList;
+        var draw;
+
+        if (draw = classes.contains("disabled"))
+            classes.remove("disabled");
+        else classes.add("disabled");
+
+        if (classes.contains("all") && appProgramData) {
+            appProgramData.drawPortals = draw;
+        } else if (classes.contains("visited") && appProgramData) {
+            appProgramData.drawVisits = draw;
+        } else if (classes.contains("captured") && appProgramData) {
+            appProgramData.drawCaptures = draw;
+        }
+
+        customLayer.onDrawLayer();
     })
 });

@@ -38,15 +38,15 @@ html, body, #map {
     height: 1.2em;
 }
 
-.line-item > i.indicator.all {
+.line-item.all > i.indicator {
     background-color: rgb(183.6, 28.05, 28.05);
 }
 
-.line-item > i.indicator.visited {
+.line-item.visited > i.indicator {
     background-color: rgb(255, 234.6, 58.65);
 }
 
-.line-item > i.indicator.captured {
+.line-item.captured > i.indicator {
     background-color: rgb(56.1, 142.8, 61.2);
 }
 
