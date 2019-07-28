@@ -128,6 +128,9 @@ class CustomLayer extends L.CanvasLayer {
         // Clear buffer
         gl.clear(gl.COLOR_BUFFER_BIT);
 
+        // Fix canvas size
+        this.resize();
+
         // Set map uniforms
         updateMapUniforms(map);
 
@@ -155,12 +158,26 @@ class CustomLayer extends L.CanvasLayer {
     _onLayerDidMove() {
         super._onLayerDidMove();
     }
+
+    resize() {
+        // Get current map size
+        var size = this._map.getSize();
+
+        if (gl.canvas.width != size.x || gl.canvas.height != size.y) {
+            // Make the canvas the same size
+            gl.canvas.width = size.x;
+            gl.canvas.height = size.y;
+
+            // Update viewport
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        }
+    }
 }
 
 function updateMapUniforms(map) {
     var origin = map.project(map.containerPointToLatLng([0, 0]), 18)._round().toArray();
-    gl.uniform2fv(appProgramInfo.uniformLocations.panning, origin);
     gl.uniform2fv(appProgramInfo.uniformLocations.canvasSize, map.getSize().toArray());
+    gl.uniform2fv(appProgramInfo.uniformLocations.panning, origin);
     gl.uniform1f(appProgramInfo.uniformLocations.zoom, map._zoom);
 }
 
