@@ -19,6 +19,7 @@ func readFile(fileName string, separator rune) ([][]string, error) {
 		return nil, err
 	}
 
+	//sed -i 's/\\\"/""/g' Portal_Export.csv
 	//sed -i 's/None\tNone$/None/g' game_log.tsv
 
 	// Initialize our csv reader
@@ -48,10 +49,10 @@ func getVisitsAndCaptures() []byte {
 	var err error
 
 	portals := make([]json.RawMessage, 0)
-	if fileContents, err = readFile("dump/Portal_Export.csv", ','); err != nil {
-		log.Println("Did not find scraped portal list, ignoring…")
+	if fileContents, err = readFile("dump/Portal_Export.csv", ','); err != nil || len(fileContents) == 0 {
+		log.Println("Could not parse scraped portal list, ignoring…")
 	} else {
-		portals = processData(fileContents, portals, func(line []string) bool {
+		portals = processData(fileContents[1:], portals, func(line []string) bool {
 			return true
 		})
 	}
