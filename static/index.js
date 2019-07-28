@@ -74,8 +74,24 @@ class CustomLayer extends L.CanvasLayer {
             // Use program
             gl.useProgram(appProgramInfo.program);
 
-            // Load the data
-            appProgramData = loadData(this._map);
+            if (!data)
+                return;
+
+            // Crate data buffers
+            appProgramData = {
+                portalsBuffer: gl.createBuffer(),
+                portalsSize: data.portals.length,
+                drawPortals: true,
+                visitsBuffer: gl.createBuffer(),
+                visitsSize: data.visits.length,
+                drawVisits: true,
+                capturesBuffer: gl.createBuffer(),
+                capturesSize: data.captures.length,
+                drawCaptures: true,
+            };
+
+            // Bind data
+            this.bindData();
         }
     }
 
@@ -83,6 +99,25 @@ class CustomLayer extends L.CanvasLayer {
         gl = undefined;
         appProgramInfo = undefined;
         appProgramData = undefined;
+    }
+
+    bindData() {
+        var map = this._map;
+        if (!appProgramData)
+            return;
+
+        function bindBuffer(buffer, bufferData) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(
+                // Project LatLong data onto WebMercator canvas
+                bufferData.map(x => map.project(L.latLng(x), 18)._round().toArray()).flat()
+            ), gl.STATIC_DRAW);
+            return buffer;
+        }
+
+        bindBuffer(appProgramData.portalsBuffer, data.portals);
+        bindBuffer(appProgramData.visitsBuffer, data.visits);
+        bindBuffer(appProgramData.capturesBuffer, data.captures);
     }
 
     onDrawLayer(_info) {
@@ -120,38 +155,6 @@ class CustomLayer extends L.CanvasLayer {
     _onLayerDidMove() {
         super._onLayerDidMove();
     }
-}
-
-function loadData(map) {
-    if (!data)
-        return
-
-    function createBuffer(bufferData) {
-        // Project LatLong data onto WebMercator canvas
-        bufferData = bufferData.map(x => map.project(L.latLng(x), 18)._round().toArray());
-
-        // Buffer object
-        var buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bufferData.flat()), gl.STATIC_DRAW);
-        return buffer;
-    }
-
-    var portalsBuffer = createBuffer(data.portals);
-    var visitsBuffer = createBuffer(data.visits);
-    var capturesBuffer = createBuffer(data.captures);
-
-    return {
-        portalsBuffer: portalsBuffer,
-        portalsSize: data.portals.length,
-        drawPortals: true,
-        visitsBuffer: visitsBuffer,
-        visitsSize: data.visits.length,
-        drawVisits: true,
-        capturesBuffer: capturesBuffer,
-        capturesSize: data.captures.length,
-        drawCaptures: true,
-    };
 }
 
 function updateMapUniforms(map) {
