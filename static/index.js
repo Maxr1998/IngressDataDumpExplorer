@@ -71,6 +71,9 @@ class CustomLayer extends L.CanvasLayer {
                 },
             };
 
+            // Use program
+            gl.useProgram(appProgramInfo.program);
+
             // Load the data
             appProgramData = loadData(this._map);
         }
@@ -87,10 +90,11 @@ class CustomLayer extends L.CanvasLayer {
         if (!appProgramInfo || !appProgramData)
             return;
 
-        //gl.clearColor(0.0, 0.0, 0.0, 0.2); // Draw shade, disabled by default
-
         // Clear buffer
         gl.clear(gl.COLOR_BUFFER_BIT);
+
+        // Set map uniforms
+        updateMapUniforms(map);
 
         function draw(buffer, size, color) {
             // Bind buffer to vertex shader attribute
@@ -98,14 +102,12 @@ class CustomLayer extends L.CanvasLayer {
             gl.vertexAttribPointer(appProgramInfo.attribLocations.position, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(appProgramInfo.attribLocations.position);
 
-            // Set uniform values
-            setUniforms(map, color)
+            // Set color uniform
+            gl.uniform4fv(appProgramInfo.uniformLocations.color, color);
 
             // Draw!
             gl.drawArrays(gl.POINTS, 0, size);
         }
-
-        gl.useProgram(appProgramInfo.program);
 
         if (appProgramData.portalsSize > 0 && appProgramData.drawPortals)
             draw(appProgramData.portalsBuffer, appProgramData.portalsSize, [0.72, 0.11, 0.11, 1.0]);
@@ -152,12 +154,11 @@ function loadData(map) {
     };
 }
 
-function setUniforms(map, color) {
+function updateMapUniforms(map) {
     var origin = map.project(map.containerPointToLatLng([0, 0]), 18)._round().toArray();
     gl.uniform2fv(appProgramInfo.uniformLocations.panning, origin);
     gl.uniform2fv(appProgramInfo.uniformLocations.canvasSize, map.getSize().toArray());
     gl.uniform1f(appProgramInfo.uniformLocations.zoom, map._zoom);
-    gl.uniform4fv(appProgramInfo.uniformLocations.color, color);
 }
 
 // INIT
