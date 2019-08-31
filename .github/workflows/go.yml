@@ -22,3 +22,6 @@ jobs:
 
     - name: Build
       run: go build -v .
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
